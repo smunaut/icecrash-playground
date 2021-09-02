@@ -1,0 +1,57 @@
+# HDMI video
+set_io -nowarn hdmi_data[0]  47		# P0
+set_io -nowarn hdmi_data[1]  44		# P1
+set_io -nowarn hdmi_data[2]  48		# P2
+set_io -nowarn hdmi_data[3]  45		# P3
+set_io -nowarn hdmi_data[4]   4		# P4
+set_io -nowarn hdmi_data[5]   3		# P5
+set_io -nowarn hdmi_data[6]   9		# P6
+set_io -nowarn hdmi_data[7]  10		# P7
+set_io -nowarn hdmi_data[8]  12		# P9
+set_io -nowarn hdmi_data[9]  21		# P10
+set_io -nowarn hdmi_data[10] 13		# P11
+set_io -nowarn hdmi_data[11] 20		# P12
+set_io -nowarn hdmi_idck     11		# P8
+set_io -nowarn hdmi_de       34		# P20
+set_io -nowarn hdmi_hsync    36		# P21
+set_io -nowarn hdmi_vsync    43		# P22
+
+# HDMI sound
+set_io -nowarn spdif 46			# P23
+
+# I2C
+set_io -nowarn i2c_scl 25		# P13
+set_io -nowarn i2c_sda 23		# P14
+
+# Controller
+set_io -nowarn gp_sel     27		# P15
+set_io -nowarn gp_data[1] 26		# P16
+set_io -nowarn gp_data[0] 28		# P17
+set_io -nowarn gp_latch   31		# P18
+set_io -nowarn gp_clk     32		# P19
+
+# USB
+set_io -nowarn usb_dp 42
+set_io -nowarn usb_dn 38
+set_io -nowarn usb_pu 37
+
+# SPI
+set_io -nowarn -pullup no  spi_sck     15
+set_io -nowarn -pullup no  spi_io[0]   14
+set_io -nowarn -pullup no  spi_io[1]   17
+set_io -nowarn -pullup no  spi_io[2]   18
+set_io -nowarn -pullup no  spi_io[3]   19
+set_io -nowarn -pullup yes spi_cs_n[0] 16
+set_io -nowarn -pullup yes spi_cs_n[1]  6
+
+# Button
+set_io -nowarn btn 2
+
+# Leds
+set_io -nowarn rgb[0] 39
+set_io -nowarn rgb[1] 40
+set_io -nowarn rgb[2] 41
+
+# Clock
+set_io -nowarn clk_in 35
+set_frequency clk_in 12

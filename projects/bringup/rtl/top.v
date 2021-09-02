@@ -62,7 +62,8 @@ module top (
 
 	// Wishbone bus
 	wire [31:0] wb_wdata;
-	wire [DL:0] wb_rdata;
+	wire [DL:0] wb_rdata_flat;
+	wire [31:0] wb_rdata [0:WB_N-1];
 	wire [15:0] wb_addr;
 	wire        wb_we;
 	wire [CL:0] wb_cyc;
@@ -100,7 +101,7 @@ module top (
 		.usb_clk    (clk_usb),
 		.usb_rst    (rst_usb),
 		.wb_wdata   (wb_wdata),
-		.wb_rdata   (wb_rdata),
+		.wb_rdata   (wb_rdata_flat),
 		.wb_addr    (wb_addr),
 		.wb_we      (wb_we),
 		.wb_cyc     (wb_cyc),
@@ -109,6 +110,10 @@ module top (
 		.clk        (clk_1x),
 		.rst        (rst_sys)
 	);
+
+	genvar i;
+	for (i=0; i<WB_N; i=i+1)
+		assign wb_rdata_flat[i*32+:32] = wb_rdata[i];
 
 
 	// DFU helper

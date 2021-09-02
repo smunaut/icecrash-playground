@@ -1,0 +1,18 @@
+[submodule "build"]
+	path = build
+	url = https://github.com/no2fpga/no2build.git
+[submodule "cores/no2misc"]
+	path = cores/no2misc
+	url = https://github.com/no2fpga/no2misc.git
+[submodule "cores/no2usb"]
+	path = cores/no2usb
+	url = https://github.com/no2fpga/no2usb.git
+[submodule "cores/no2ice40"]
+	path = cores/no2ice40
+	url = https://github.com/no2fpga/no2ice40.git
+[submodule "cores/no2qpimem"]
+	path = cores/no2qpimem
+	url = https://github.com/no2fpga/no2qpimem.git
+[submodule "cores/no2muacm-bin"]
+	path = cores/no2muacm-bin
+	url = https://github.com/no2fpga/no2muacm-bin.git

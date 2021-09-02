@@ -4,6 +4,8 @@ PROJ := bringup
 PROJ_DEPS := no2usb no2misc no2ice40
 PROJ_RTL_SRCS := $(addprefix rtl/, \
 	dfu_helper.v \
+	i2c_master.v \
+	i2c_master_wb.v \
 	muacm_xclk.v \
 	muacm2wb.v \
 	stream2wb.v \

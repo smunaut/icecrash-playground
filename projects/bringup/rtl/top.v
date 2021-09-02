@@ -51,7 +51,7 @@ module top (
 );
 
 	// Config
-	localparam integer WB_N = 3;
+	localparam integer WB_N = 1;
 
 	localparam integer DL = (32*WB_N)-1;
 	localparam integer CL = WB_N-1;
@@ -71,6 +71,11 @@ module top (
 
 	wire [31:0] aux_csr;
 
+	// I2C
+	wire        i2c_scl_oe;
+	wire        i2c_sda_oe;
+	wire        i2c_sda_i;
+
 	// DFU helper
 	wire        bootloader_req;
 	wire        rst_req;
@@ -87,6 +92,52 @@ module top (
 	wire clk_usb;
 	wire rst_usb;
 
+
+
+	// I2C [0]
+	// ---
+
+	// Core
+	i2c_master_wb #(
+		.DW(4)
+	) i2c_I (
+		.scl_oe   (i2c_scl_oe),
+		.sda_oe   (i2c_sda_oe),
+		.sda_i    (i2c_sda_i),
+		.wb_wdata (wb_wdata),
+		.wb_rdata (wb_rdata[0]),
+		.wb_we    (wb_we),
+		.wb_cyc   (wb_cyc[0]),
+		.wb_ack   (wb_ack[0]),
+		.ready    (),
+		.clk      (clk_1x),
+		.rst      (rst_sys)
+	);
+
+	// IOBs
+    SB_IO #(
+        .PIN_TYPE    (6'b1101_01),
+        .PULLUP      (1'b1),
+        .IO_STANDARD ("SB_LVCMOS")
+    ) i2c_scl_iob (
+        .PACKAGE_PIN   (i2c_scl),
+        .OUTPUT_CLK    (clk_1x),
+        .OUTPUT_ENABLE (i2c_scl_oe),
+        .D_OUT_0       (1'b0)
+    );
+
+    SB_IO #(
+        .PIN_TYPE    (6'b1101_00),
+        .PULLUP      (1'b1),
+        .IO_STANDARD ("SB_LVCMOS")
+    ) i2c_sda_iob (
+        .PACKAGE_PIN   (i2c_sda),
+        .INPUT_CLK     (clk_1x),
+        .OUTPUT_CLK    (clk_1x),
+        .OUTPUT_ENABLE (i2c_sda_oe),
+        .D_OUT_0       (1'b0),
+        .D_IN_0        (i2c_sda_i)
+    );
 
 
 	// USB <-> Wishbone bridge

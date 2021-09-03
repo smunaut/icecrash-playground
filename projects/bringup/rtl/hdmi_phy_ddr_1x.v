@@ -13,6 +13,7 @@
 
 module hdmi_phy_ddr_1x #(
 	parameter integer DW = 12,
+	parameter         EDGE = 1'b0,
 
 	// auto-set
 	parameter integer EL =   DW - 1,
@@ -44,8 +45,8 @@ module hdmi_phy_ddr_1x #(
 	) iob_hdmi_data_I[DW-1:0] (
 		.PACKAGE_PIN (hdmi_data),
 		.OUTPUT_CLK  (clk),
-		.D_OUT_0     (in_data[  DW-1: 0]),
-		.D_OUT_1     (in_data[2*DW-1:DW])
+		.D_OUT_1     (in_data[  DW-1: 0]),
+		.D_OUT_0     (in_data[2*DW-1:DW])
 	);
 
 	// H-Sync / V-Sync / DE
@@ -57,8 +58,8 @@ module hdmi_phy_ddr_1x #(
 	) iob_hdmi_ctrl_I[2:0] (
 		.PACKAGE_PIN ({hdmi_hsync, hdmi_vsync, hdmi_de}),
 		.OUTPUT_CLK  (clk),
-		.D_OUT_0     ({in_hsync,   in_vsync,   in_de}),
-		.D_OUT_1     ({in_hsync,   in_vsync,   in_de})
+		.D_OUT_1     ({in_hsync,   in_vsync,   in_de}),
+		.D_OUT_0     ({in_hsync,   in_vsync,   in_de})
 	);
 
 	// Clock
@@ -70,8 +71,8 @@ module hdmi_phy_ddr_1x #(
 	) iob_hdmi_clk_I (
 		.PACKAGE_PIN (hdmi_clk),
 		.OUTPUT_CLK  (clk),
-		.D_OUT_0     (1'b0),
-		.D_OUT_1     (1'b1)
+		.D_OUT_1     ( EDGE),
+		.D_OUT_0     (~EDGE)
 	);
 
 endmodule // hdmi_phy_ddr_1x

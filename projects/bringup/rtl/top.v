@@ -115,7 +115,8 @@ module top (
 
 	// PHY
 	hdmi_phy_ddr_1x #(
-		.DW(12)
+		.DW   (12),		// 12bits DDR
+		.EDGE (1'b0)	// Falling edge first (match Sil9022 config !)
 	) hdmi_phy_I (
 		.hdmi_data  (hdmi_data),
 		.hdmi_hsync (hdmi_hsync),

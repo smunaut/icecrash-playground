@@ -293,6 +293,22 @@ def main(argv0, port='/dev/ttyACM0'):
 	]
 	print(f"[Sil9022] DevID={chip_id[0]:02x}, RevID={chip_id[1]:02x}, TPI={chip_id[2]:02x}")
 
+	# Basic video mode setup
+	i2c.write_reg(0x72, 0x00, 0xd0)
+	i2c.write_reg(0x72, 0x01, 0x09)
+
+	i2c.write_reg(0x72, 0x02, 0x3c)
+	i2c.write_reg(0x72, 0x03, 0x00)
+
+	i2c.write_reg(0x72, 0x04, 0x20)
+	i2c.write_reg(0x72, 0x05, 0x03)
+
+	i2c.write_reg(0x72, 0x06, 0x0d)
+	i2c.write_reg(0x72, 0x07, 0x02)
+
+	# Disable TMDS output
+	i2c.write_reg(0x72, 0x1a, 0x01)
+
 	# Power up transmitter
 	i2c.write_reg(0x72, 0x1e, 0x00)	# D0 state = full power up
 
@@ -300,18 +316,17 @@ def main(argv0, port='/dev/ttyACM0'):
 		# 1x, Half-width, Edge=Falling, No repeat
 	i2c.write_reg(0x72, 0x08, 0x40)
 
-	#i2c.write_reg(0x72, 0x0b, )
+	i2c.write_reg(0x72, 0x09, 0x00)	# In: 8b RGB
+	i2c.write_reg(0x72, 0x0a, 0x00)	# Out: 8b RGB
 
-	#i2c.write_reg(0x72, 0x60, )
-	#i2c.write_reg(0x72, 0x61, )
-
-	#i2c.write_reg(0x72, 0x62, )
-	#...
-	#i2c.write_reg(0x72, 0x6d, )
+	i2c.write_reg(0x72, 0x60, 0x00)	# External sync
+	i2c.write_reg(0x72, 0x61, 0x00)	# Progressive, H+, V+
 
 	# Setup interrupt service
 	i2c.write_reg(0x72, 0x3c, 0x1b)
 
+	# Enable TMDS output
+	i2c.write_reg(0x72, 0x1a, 0x01)
 
 
 if __name__ == '__main__':

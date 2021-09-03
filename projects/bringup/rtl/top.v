@@ -71,6 +71,12 @@ module top (
 
 	wire [31:0] aux_csr;
 
+	// Video
+	wire [23:0] vid_data;
+	wire        vid_hsync;
+	wire        vid_vsync;
+	wire        vid_de;
+
 	// I2C
 	wire        i2c_scl_oe;
 	wire        i2c_sda_oe;
@@ -92,6 +98,36 @@ module top (
 	wire clk_usb;
 	wire rst_usb;
 
+
+
+	// Video
+	// -----
+
+	// Test-pattern
+	vid_test hdmi_pgen_I (
+		.out_data  (vid_data),
+		.out_hsync (vid_hsync),
+		.out_vsync (vid_vsync),
+		.out_de    (vid_de),
+		.clk       (clk_1x),
+		.rst       (rst_sys)
+	);
+
+	// PHY
+	hdmi_phy_ddr_1x #(
+		.DW(12)
+	) hdmi_phy_I (
+		.hdmi_data  (hdmi_data),
+		.hdmi_hsync (hdmi_hsync),
+		.hdmi_vsync (hdmi_vsync),
+		.hdmi_de    (hdmi_de),
+		.hdmi_clk   (hdmi_idck),
+		.in_data    (vid_data),
+		.in_hsync   (vid_hsync),
+		.in_vsync   (vid_vsync),
+		.in_de      (vid_de),
+		.clk        (clk_1x)
+	);
 
 
 	// I2C [0]

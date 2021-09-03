@@ -27,13 +27,17 @@ module vid_test (
 	// -------
 
 	// Timing gen
-	wire tg_hsync;
-	wire tg_vsync;
-	wire tg_active;
-	wire tg_h_first;
-	wire tg_h_last;
-	wire tg_v_first;
-	wire tg_v_last;
+	wire tg_hsync_0;
+	wire tg_vsync_0;
+	wire tg_active_0;
+	wire tg_h_first_0;
+	wire tg_h_last_0;
+	wire tg_v_first_0;
+	wire tg_v_last_0;
+
+	// Position
+	reg [11:0] pos_x_0;
+	reg [11:0] pos_y_0;
 
 
 	// Timing generator
@@ -51,21 +55,40 @@ module vid_test (
 		.V_BP     ( 33),
 		.V_ACTIVE (480)
 	) tgen_I (
-		.vid_hsync   (tg_hsync),
-		.vid_vsync   (tg_vsync),
-		.vid_active  (tg_active),
-		.vid_h_first (tg_h_first),
-		.vid_h_last  (tg_h_last ),
-		.vid_v_first (tg_v_first),
-		.vid_v_last  (tg_v_last),
+		.vid_hsync   (tg_hsync_0),
+		.vid_vsync   (tg_vsync_0),
+		.vid_active  (tg_active_0),
+		.vid_h_first (tg_h_first_0),
+		.vid_h_last  (tg_h_last_0),
+		.vid_v_first (tg_v_first_0),
+		.vid_v_last  (tg_v_last_0),
 		.clk         (clk),
 		.rst         (rst)
 	);
 
 
-	assign out_data  = 24'h000000;
-	assign out_hsync = tg_hsync;
-	assign out_vsync = tg_vsync;
-	assign out_de    = tg_active;
+	// Position counter
+	// ----------------
+
+	always @(posedge clk)
+	begin
+		// X
+		pos_x_0 <= (pos_x_0 + tg_active_0) & {12{~tg_h_last_0}};
+
+		// Y
+		if (tg_h_last_0)
+			pos_y_0 <= (pos_y_0 + 1) & {12{~tg_v_last_0}};
+	end
+
+
+	// Some dumb pattern
+	// -----------------
+
+	assign out_data[23:16] = pos_x_0[7:0];                    // R
+	assign out_data[15: 8] = ~|pos_x_0[3:0] | ~|pos_y_0[3:0]; // G
+	assign out_data[ 7: 0] = pos_y_0[7:0];                    // B
+	assign out_hsync = tg_hsync_0;
+	assign out_vsync = tg_vsync_0;
+	assign out_de    = tg_active_0;
 
 endmodule // vid_test

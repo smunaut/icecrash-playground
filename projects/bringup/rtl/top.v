@@ -77,6 +77,10 @@ module top (
 	wire        vid_vsync;
 	wire        vid_de;
 
+	// Audio
+	reg  [15:0] audio_val;
+	wire        audio_ack;
+
 	// I2C
 	wire        i2c_scl_oe;
 	wire        i2c_sda_oe;
@@ -177,6 +181,33 @@ module top (
     );
 
 
+	// Audio
+	// -----
+
+	// Triangle wave generator (750 Hz at 48 ksps)
+	always @(posedge clk_1x)
+		if (audio_ack)
+			audio_val <= audio_val + 16'd1024;
+
+	// Encoder
+	spdif_tx #(
+		// Approximate 6.144 MHz clock from 25.125 MHz
+		// (we get 6.137 which is 0.1% off)
+		.ACC_STEP (131),
+		.ACC_FRAC (  5)
+	) spdif_I (
+		.spdif      (spdif),
+		.spdif_tick (),
+		.audio_l    ({2'b00, audio_val, 6'b000000}),
+		.audio_r    ({2'b00, audio_val, 6'b000000}),
+		.ack        (audio_ack),
+		.mode       (1'b0), // PCM
+		.valid      (1'b1),
+		.clk        (clk_1x),
+		.rst        (rst_sys)
+	);
+
+
 	// USB <-> Wishbone bridge
 	// -----------------------
 
@@ -244,7 +275,7 @@ module top (
 	);
 
 	// Debug signals
-	assign rgb_pwm[0] = 1'b0;
+	assign rgb_pwm[0] = spdif;
 	assign rgb_pwm[1] = rst_sys;
 	assign rgb_pwm[2] = rst_usb;
 

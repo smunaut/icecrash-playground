@@ -11,6 +11,8 @@ PROJ_RTL_SRCS := $(addprefix rtl/, \
 	muacm2wb.v \
 	vid_test.v \
 	vid_tgen.v \
+	spdif_tx.v \
+	spdif_word_code.v \
 	stream2wb.v \
 	sysmgr.v \
 )

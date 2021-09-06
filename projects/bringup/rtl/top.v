@@ -150,7 +150,6 @@ module top (
 		.wb_we    (wb_we),
 		.wb_cyc   (wb_cyc[0]),
 		.wb_ack   (wb_ack[0]),
-		.ready    (),
 		.clk      (clk_1x),
 		.rst      (rst_sys)
 	);

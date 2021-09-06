@@ -325,6 +325,9 @@ def main(argv0, port='/dev/ttyACM0'):
 	# Setup interrupt service
 	i2c.write_reg(0x72, 0x3c, 0x1b)
 
+	# Setup SPDIF automatic mode
+	i2c.write_reg(0x72, 0x26, 0x40)
+
 	# Enable TMDS output
 	i2c.write_reg(0x72, 0x1a, 0x01)
 

@@ -14,5 +14,5 @@
 	path = cores/no2qpimem
 	url = https://github.com/no2fpga/no2qpimem.git
 [submodule "cores/no2muacm-bin"]
-	path = cores/no2muacm-bin
+	path = cores/no2muacm/bin
 	url = https://github.com/no2fpga/no2muacm-bin.git

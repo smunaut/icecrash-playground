@@ -72,7 +72,7 @@ module sysmgr (
 		.GLOBAL_BUF (0),
 		.LOCAL_BUF  (0),
 		.BEL_COL    ("X21"),
-		.BEL_ROW    ("Y4"),
+		.BEL_ROW    ("Y4")
 	) sync_4x_I (
 		.clk_slow (clk_1x),
 		.clk_fast (clk_4x),

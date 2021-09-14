@@ -210,7 +210,7 @@ module top (
 	// -----------------------
 
 	muacm2wb #(
-		.WB_N(3)
+		.WB_N(WB_N)
 	) wb_I (
 		.usb_dp     (usb_dp),
 		.usb_dn     (usb_dn),
@@ -223,6 +223,7 @@ module top (
 		.wb_we      (wb_we),
 		.wb_cyc     (wb_cyc),
 		.wb_ack     (wb_ack),
+		.aux_csr    (aux_csr),
 		.bootloader (bootloader_req),
 		.clk        (clk_1x),
 		.rst        (rst_sys)

@@ -12,7 +12,17 @@
 `default_nettype none
 
 module spdif_tx #(
-	parameter integer ACC_STEP  = 125, /* (sys_clk / (2 * spdif_clk)) * (1 << ACC_FRAC) */
+	/*
+	 * The spdif bitrate should be 3.072M (classic 2 channel 48 kHz), which
+	 * means for the biphase code we need to generate a 6.144 MHz tick.
+	 *
+	 * To approximate it, ACC_STEP should be set to :
+	 * (sys_clk / (2 * spdif_bitrate)) * (1 << ACC_FRAC)
+	 *
+	 * The actual resulting rate will be :
+	 * (sys_clk * (1 << ACC_FRAC)) / (2 * ACC_STEP)
+	 */
+	parameter integer ACC_STEP  = 125,
 	parameter integer ACC_FRAC  = 4    /* # fractional bits so that ACC_STEP is integer */
 )(
 	// SPDIF out

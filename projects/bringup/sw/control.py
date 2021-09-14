@@ -331,6 +331,10 @@ def main(argv0, port='/dev/ttyACM0'):
 	# Enable TMDS output
 	i2c.write_reg(0x72, 0x1a, 0x01)
 
+	# Read audio status
+	time.sleep(0.1)
+	print("Audio status: %02x" % i2c.read_reg(0x72, 0x24));
+
 
 if __name__ == '__main__':
 	main(*sys.argv)

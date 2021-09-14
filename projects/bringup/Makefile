@@ -11,6 +11,9 @@ PROJ_RTL_SRCS := $(addprefix rtl/, \
 	spdif_word_code.v \
 	sysmgr.v \
 )
+PROJ_TESTBENCHES := \
+	spdif_tx_tb \
+	$(NULL)
 PROJ_TOP_SRC := rtl/top.v
 PROJ_TOP_MOD := top
 

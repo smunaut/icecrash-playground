@@ -190,10 +190,10 @@ module top (
 
 	// Encoder
 	spdif_tx #(
-		// Approximate 6.144 MHz clock from 25.125 MHz
-		// (we get 6.137 which is 0.1% off)
-		.ACC_STEP (131),
-		.ACC_FRAC (  5)
+		// Approximate 3.072M bitrate 25.125 MHz
+		// (we get 3.045M which is 0.86% off)
+		.ACC_STEP (33),
+		.ACC_FRAC ( 3)
 	) spdif_I (
 		.spdif      (spdif),
 		.spdif_tick (),

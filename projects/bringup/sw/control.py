@@ -53,7 +53,7 @@ class WishboneInterface(object):
 		if len(d) != 4:
 			raise RuntimeError('Comm error')
 		return int.from_bytes(d, 'big')
-	
+
 	def read_burst(self, addr, burst_len, adv=4):
 		req_addr = addr
 		ofs  = 0
@@ -76,7 +76,7 @@ class WishboneInterface(object):
 				if len(d) != 4:
 					raise RuntimeError('Comm error')
 				resp.append( int.from_bytes(d, 'big') )
-	
+
 		return resp
 
 	def aux_csr(self, value):
@@ -257,7 +257,7 @@ class I2CMaster(object):
 		self.write(reg)
 		self.write(val)
 		self.stop()
-	
+
 	def read_reg(self, dev, reg):
 		self.start()
 		self.write(dev)

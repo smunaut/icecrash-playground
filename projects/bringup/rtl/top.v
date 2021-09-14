@@ -208,10 +208,83 @@ module top (
 	// Audio
 	// -----
 
-	// Triangle wave generator (750 Hz at 48 ksps)
+	reg  [23:0] fr_addr;
+	wire [15:0] fr_len;
+	wire        fr_go;
+	wire        fr_rdy;
+
+	wire [9:0] af_level;
+	wire       af_aempty;
+
+	wire [7:0] af_wdata;
+	wire       af_wena;
+	wire       af_full;
+
+	wire [7:0] af_rdata;
+	wire       af_rena;
+	wire       af_empty;
+
+	// Flash read
+	spi_flash_reader fr_I (
+		.spi_mosi (spi_io[0]),
+		.spi_miso (spi_io[1]),
+		.spi_cs_n (spi_cs_n[0]),
+		.spi_clk  (spi_sck),
+		.addr     (fr_addr),
+		.len      (fr_len),
+		.go       (fr_go),
+		.rdy      (fr_rdy),
+		.data     (af_wdata),
+		.valid    (af_wena),
+		.clk      (clk_1x),
+		.rst      (rst_sys)
+	);
+
+	always @(posedge clk_1x)
+		if (rst_sys)
+			fr_addr <= 24'h800000;
+		else if (fr_go)
+			fr_addr <= {1'b1, fr_addr[22:0] + 23'd128 };
+
+	assign fr_len = 16'd127;
+	assign fr_go  = fr_rdy & af_aempty & aux_csr[0];
+
+	// FIFO
+	fifo_sync_ram #(
+		.WIDTH(8),
+		.DEPTH(512)
+	) audio_fifo_I (
+		.wr_data  (af_wdata),
+		.wr_ena   (af_wena),
+		.wr_full  (af_full),
+		.rd_data  (af_rdata),
+		.rd_ena   (af_rena),
+		.rd_empty (af_empty),
+		.clk      (clk_1x),
+		.rst      (rst_sys)
+	);
+
+	always @(posedge clk_1x)
+		if (rst_sys)
+			af_level <= 0;
+		else if (af_wena & ~af_rena)
+			af_level <= af_level + 1;
+		else if (af_rena & ~af_wena)
+			af_level <= af_level - 1;
+
+	assign af_aempty = (af_level[9:8] == 2'b00);
+
+	// Audio source:
+	//  - FIFO or
+	//  - Triangle wave generator (750 Hz at 48 ksps)
 	always @(posedge clk_1x)
 		if (audio_ack)
-			audio_val <= audio_val + 16'd1024;
+			if (aux_csr[0])
+				audio_val <= af_empty ? 16'h0000 : { af_rdata, af_rdata };
+			else
+				audio_val <= audio_val + 16'd1024;
+
+	assign af_rena = ~af_empty & aux_csr[0] & audio_ack;
 
 	// Encoder
 	spdif_tx #(

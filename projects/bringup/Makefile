@@ -4,6 +4,7 @@ PROJ := bringup
 PROJ_DEPS := icecrash no2ice40 no2misc no2muacm
 PROJ_RTL_SRCS := $(addprefix rtl/, \
 	vid_test.v \
+	spi_flash_reader.v \
 	sysmgr.v \
 )
 PROJ_TESTBENCHES := \

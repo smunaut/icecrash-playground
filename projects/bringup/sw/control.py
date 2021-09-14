@@ -382,6 +382,9 @@ def main(argv0, port='/dev/ttyACM0'):
 	time.sleep(0.1)
 	print("Audio status: %02x" % i2c.read_reg(0x72, 0x24));
 
+	# Enable audio-playback
+	wbi.aux_csr(1)
+
 	# Controller
 	poll_gamepad_cont(wbi)
 	#poll_gamepad_od(wbi)

@@ -76,7 +76,7 @@ module vid_test (
 		pos_x_0 <= (pos_x_0 + tg_active_0) & {12{~tg_h_last_0}};
 
 		// Y
-		if (tg_h_last_0)
+		if (tg_h_last_0 & tg_active_0)
 			pos_y_0 <= (pos_y_0 + 1) & {12{~tg_v_last_0}};
 	end
 
@@ -84,9 +84,9 @@ module vid_test (
 	// Some dumb pattern
 	// -----------------
 
-	assign out_data[23:16] = pos_x_0[7:0];                    // R
-	assign out_data[15: 8] = ~|pos_x_0[3:0] | ~|pos_y_0[3:0]; // G
-	assign out_data[ 7: 0] = pos_y_0[7:0];                    // B
+	assign out_data[23:16] = pos_x_0[7:0];                         // R
+	assign out_data[15: 8] = {8{~|pos_x_0[3:0] | ~|pos_y_0[3:0]}}; // G
+	assign out_data[ 7: 0] = pos_y_0[7:0];                         // B
 	assign out_hsync = tg_hsync_0;
 	assign out_vsync = tg_vsync_0;
 	assign out_de    = tg_active_0;

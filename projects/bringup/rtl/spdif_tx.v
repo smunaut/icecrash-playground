@@ -34,7 +34,6 @@ module spdif_tx #(
 	input  wire [23:0] audio_r,
 	output reg         ack,
 
-	input  wire        mode,	// 0=PCM, 1=IEC 61937
 	input  wire        valid,
 
 	// Clock / Reset
@@ -59,7 +58,6 @@ module spdif_tx #(
 	reg  [ 8:0] sf_cnt;
 	reg         sf_first;
 	wire        sf_last;
-	wire        sf_low;
 
 	reg         sf_csb;
 	reg  [ 1:0] sf_preamble;
@@ -85,16 +83,26 @@ module spdif_tx #(
 		end
 
 	assign sf_last = sf_cnt == 9'h17f;
-	assign sf_low  = ~|sf_cnt[8:3];
 
 	// Channel status
-		// Really only some LSBs are used at all
-		// [191:4] = 0
-		// [  3:0] = 0100 for PCM
-		// [  3:0] = 0110 for IEC 61937
 	always @(*)
-		if (sf_low)
-			sf_csb = (mode ? 4'b0110 : 4'b0100) >> sf_cnt[2:1];
+		if (sf_cnt[8:1] < 40)
+			sf_csb = {
+				4'hd,	// [39:36] Original sampling frequency: 48 kHz
+				3'b101,	// [35:33] Sample word length = 24 bits
+				1'b1,	//    [32] Maxmimum audio sample length is 24 bits
+				2'b00,	// N/A
+				2'b00,	// [29:28] Level 2 clock accuracy
+				4'h2,	// [27:24] Sampling frequency: 48 kHz
+				4'h0,	// [23:20] Channel number: Do not take into account
+				4'h0,	// [19:16] Source number: Do not take into account
+				8'h00,	// [15: 8] Category code
+				2'b00,	//  [7: 6] Mode 0
+				3'b000,	//  [5: 3] 2 audio channel without pre-emphasis
+				1'b1,	//    [ 2] No copyright
+				1'b0,	//    [ 1] Audio is PCM samples
+				1'b0	//    [ 0] Consumer use
+			} >> sf_cnt[8:1];
 		else
 			sf_csb = 1'b0;
 

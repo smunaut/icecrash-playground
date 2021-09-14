@@ -200,7 +200,6 @@ module top (
 		.audio_l    ({2'b00, audio_val, 6'b000000}),
 		.audio_r    ({2'b00, audio_val, 6'b000000}),
 		.ack        (audio_ack),
-		.mode       (1'b0), // PCM
 		.valid      (1'b1),
 		.clk        (clk_1x),
 		.rst        (rst_sys)

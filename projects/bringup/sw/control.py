@@ -335,6 +335,27 @@ def main(argv0, port='/dev/ttyACM0'):
 	time.sleep(0.1)
 	print("Audio status: %02x" % i2c.read_reg(0x72, 0x24));
 
+	# Controller
+		# Enable
+	wbi.write(0x10000, 1)
+
+		# Poll
+	pv = None
+
+	while True:
+		# Read value
+		rv = [ wbi.read(0x10000 + i) for i in range(4) ]
+
+		# Display if changed
+		if pv != rv:
+			fv = [f"{rv[i]:016b}" for i in range(4)]
+			print("\t".join(fv))
+
+		pv = rv
+
+		# Wait a bit
+		time.sleep(0.05)
+
 
 if __name__ == '__main__':
 	main(*sys.argv)

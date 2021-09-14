@@ -51,7 +51,7 @@ module top (
 );
 
 	// Config
-	localparam integer WB_N = 1;
+	localparam integer WB_N = 2;
 
 	localparam integer DL = (32*WB_N)-1;
 	localparam integer CL = WB_N-1;
@@ -178,6 +178,29 @@ module top (
         .D_OUT_0       (1'b0),
         .D_IN_0        (i2c_sda_i)
     );
+
+
+	// Game Pads [1]
+	// ---------
+
+	gamepad_wb #(
+		.DIV        (200),
+		.SEL_WIDTH  (1),
+		.DATA_WIDTH (2)
+	) gamepad_I (
+		.gp_sel  (gp_sel),
+		.gp_data (gp_data),
+		.gp_latch(gp_latch),
+		.gp_clk  (gp_clk),
+		.wb_addr (wb_addr[3:0]),
+		.wb_wdata(wb_wdata),
+		.wb_rdata(wb_rdata[1]),
+		.wb_we   (wb_we),
+		.wb_cyc  (wb_cyc[1]),
+		.wb_ack  (wb_ack[1]),
+		.clk     (clk_1x),
+		.rst     (rst_sys)
+	);
 
 
 	// Audio

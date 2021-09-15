@@ -298,6 +298,26 @@ def poll_gamepad_cont(wbi):
 		time.sleep(0.05)
 
 
+def poll_gamepad_od(wbi):
+	# Poll
+	pv = None
+
+	while True:
+		# Request value
+		wbi.write(0x10000, 0)
+
+		# Wait a bit
+		time.sleep(0.05)
+
+		# Read value
+		rv = wbi.read(0x10000) & 0xfff
+
+		if pv != rv:
+			print(f"{rv:012b}")
+
+		pv = rv
+
+
 def main(argv0, port='/dev/ttyACM0'):
 	wbi   = WishboneInterface(port=port)
 	i2c   = I2CMaster(wbi, 0x00000)
@@ -360,6 +380,7 @@ def main(argv0, port='/dev/ttyACM0'):
 
 	# Controller
 	poll_gamepad_cont(wbi)
+	#poll_gamepad_od(wbi)
 
 
 if __name__ == '__main__':

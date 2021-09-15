@@ -38,11 +38,11 @@ module sysmgr (
 
 	// System reset
 	reg [3:0] rst_sys_cnt;
-	reg       rst_sys_i;
+	wire      rst_sys_i;
 
 	// USB reset
 	reg [3:0] rst_usb_cnt;
-	reg       rst_usb_i;
+	wire      rst_usb_i;
 
 
 	// System clock

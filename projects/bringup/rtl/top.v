@@ -183,10 +183,11 @@ module top (
 	// Game Pads [1]
 	// ---------
 
-	gamepad_wb #(
+	gamepad_cont_wb #(
 		.DIV        (200),
 		.SEL_WIDTH  (1),
-		.DATA_WIDTH (2)
+		.DATA_WIDTH (2),
+		.REG_WIDTH  (16)
 	) gamepad_I (
 		.gp_sel  (gp_sel),
 		.gp_data (gp_data),

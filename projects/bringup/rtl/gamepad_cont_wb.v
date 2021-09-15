@@ -1,5 +1,5 @@
 /*
- * gamepad_wb.v
+ * gamepad_cont_wb.v
  *
  * vim: ts=4 sw=4
  *
@@ -9,15 +9,16 @@
 
 `default_nettype none
 
-module gamepad_wb #(
+module gamepad_cont_wb #(
 	parameter integer DIV = 150,
-	parameter integer SEL_WIDTH = 1,
-	parameter integer DATA_WIDTH = 2,
+	parameter integer SEL_WIDTH = 1,	// Select line width
+	parameter integer DATA_WIDTH = 2,	// Number of parallel
+	parameter integer REG_WIDTH = 12,	// Shift Register width
 
 	// auto-set
-	parameter integer SL = SEL_WIDTH ? (SEL_WIDTH - 1) : 0,
-	parameter integer DL = DATA_WIDTH - 1,
-	parameter integer OL = ((16 * DATA_WIDTH) << SEL_WIDTH) - 1
+	parameter integer SL = SEL_WIDTH ? (SEL_WIDTH - 1) : 0,				// Sel line left bound
+	parameter integer DL = DATA_WIDTH - 1,								// Data in left bound
+	parameter integer VL = ((REG_WIDTH * DATA_WIDTH) << SEL_WIDTH) - 1	// Value out left bound
 )(
 	// Controller
 	output reg  [SL:0] gp_sel,
@@ -40,11 +41,12 @@ module gamepad_wb #(
 
 	// Signals
 	// -------
-	
-	localparam integer N = DATA_WIDTH << SEL_WIDTH;
 
-	wire [OL:0] gp_value_flat;
-	wire [15:0] gp_value[0:N-1];
+	localparam integer RL = REG_WIDTH - 1;			// Shift Register left bound
+	localparam integer N = DATA_WIDTH << SEL_WIDTH;	// Number of game pads
+
+	wire [VL:0] gp_value_flat;
+	wire [RL:0] gp_value[0:N-1];
 
 	reg         ctrl_run;
 
@@ -55,10 +57,11 @@ module gamepad_wb #(
 	// ----
 
 	// Instance
-	gamepad #(
+	gamepad_cont #(
 		.DIV        (DIV),
 		.SEL_WIDTH  (SEL_WIDTH),
-		.DATA_WIDTH (DATA_WIDTH)
+		.DATA_WIDTH (DATA_WIDTH),
+		.REG_WIDTH  (REG_WIDTH)
 	) core_I (
 		.gp_sel   (gp_sel),
 		.gp_data  (gp_data),
@@ -74,7 +77,7 @@ module gamepad_wb #(
 	genvar i;
 
 	for (i=0; i<N; i=i+1)
-		assign gp_value[i] = gp_value_flat[i*16+:16];
+		assign gp_value[i] = gp_value_flat[i*REG_WIDTH+:REG_WIDTH];
 
 
 	// Bus interface
@@ -90,8 +93,10 @@ module gamepad_wb #(
 	always @(posedge clk)
 		if (bus_clr)
 			wb_rdata <= 0;
-		else
-			wb_rdata <= { 16'h0000, gp_value[wb_addr] };
+		else begin
+			wb_rdata <= 0;
+			wb_rdata[RL:0] <= gp_value[wb_addr];
+		end
 
 	// "CSR"
 	always @(posedge clk)
@@ -100,4 +105,4 @@ module gamepad_wb #(
 		else if (wb_ack & wb_we)
 			ctrl_run <= wb_wdata[0];
 
-endmodule // gamepad_wb
+endmodule // gamepad_cont_wb

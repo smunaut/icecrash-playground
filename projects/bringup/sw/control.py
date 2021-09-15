@@ -275,6 +275,7 @@ class I2CMaster(object):
 def hexdump(x):
 	return binascii.b2a_hex(x).decode('utf-8')
 
+
 def poll_gamepad_cont(wbi):
 	# Enable
 	wbi.write(0x10000, 1)

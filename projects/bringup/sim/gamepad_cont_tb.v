@@ -1,5 +1,5 @@
 /*
- * gamepad_tb.v
+ * gamepad_cont_tb.v
  *
  * vim: ts=4 sw=4
  *
@@ -10,7 +10,7 @@
 `default_nettype none
 `timescale 1ns / 100ps
 
-module gamepad_tb;
+module gamepad_cont_tb;
 
 	// Signals
 	// -------
@@ -20,7 +20,7 @@ module gamepad_tb;
 	wire        gp_latch;
 	wire        gp_clk;
 
-	wire [63:0] gp_value;
+	wire [47:0] gp_value;
 
 	reg rst = 1'b1;
 	reg clk = 1'b0;
@@ -29,7 +29,7 @@ module gamepad_tb;
 	// DUT
 	// ---
 
-	gamepad #(
+	gamepad_cont #(
 		.DIV        (15),
 		.SEL_WIDTH  (1),
 		.DATA_WIDTH (2)
@@ -44,14 +44,16 @@ module gamepad_tb;
 		.rst      (rst)
 	);
 
+	assign gp_data = { gp_sel, ~gp_sel };
+
 
 	// Test bench
 	// ----------
 
 	// Setup recording
 	initial begin
-		$dumpfile("gamepad_tb.vcd");
-		$dumpvars(0,gamepad_tb);
+		$dumpfile("gamepad_cont_tb.vcd");
+		$dumpvars(0,gamepad_cont_tb);
 	end
 
 	// Reset pulse
@@ -63,4 +65,4 @@ module gamepad_tb;
 	// Clocks
 	always #19.9 clk = !clk;	// 25.125 MHz
 
-endmodule // gamepad_tb
+endmodule // gamepad_cont_tb

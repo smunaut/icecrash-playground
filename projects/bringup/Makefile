@@ -4,8 +4,8 @@ PROJ := bringup
 PROJ_DEPS := no2ice40 no2misc no2muacm
 PROJ_RTL_SRCS := $(addprefix rtl/, \
 	dfu_helper.v \
-	gamepad.v \
-	gamepad_wb.v \
+	gamepad_cont.v \
+	gamepad_cont_wb.v \
 	hdmi_phy_ddr_1x.v \
 	vid_test.v \
 	vid_tgen.v \
@@ -14,7 +14,7 @@ PROJ_RTL_SRCS := $(addprefix rtl/, \
 	sysmgr.v \
 )
 PROJ_TESTBENCHES := \
-	gamepad_tb \
+	gamepad_cont_tb \
 	spdif_tx_tb \
 	$(NULL)
 PROJ_TOP_SRC := rtl/top.v

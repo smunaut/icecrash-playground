@@ -1,5 +1,8 @@
 /*
- * gamepad.v
+ * gamepad_cont.v
+ *
+ * "Continuous" version of gamepad.
+ * This scans all controllers in a loop and output the latest value for each
  *
  * vim: ts=4 sw=4
  *
@@ -9,15 +12,16 @@
 
 `default_nettype none
 
-module gamepad #(
+module gamepad_cont #(
 	parameter integer DIV = 150,
-	parameter integer SEL_WIDTH = 1,
-	parameter integer DATA_WIDTH = 2,
+	parameter integer SEL_WIDTH = 1,	// Select line width
+	parameter integer DATA_WIDTH = 2,	// Number of parallel
+	parameter integer REG_WIDTH = 12,	// Shift Register width
 
 	// auto-set
-	parameter integer SL = SEL_WIDTH ? (SEL_WIDTH - 1) : 0,
-	parameter integer DL = DATA_WIDTH - 1,
-	parameter integer OL = ((16 * DATA_WIDTH) << SEL_WIDTH) - 1
+	parameter integer SL = SEL_WIDTH ? (SEL_WIDTH - 1) : 0,				// Sel line left bound
+	parameter integer DL = DATA_WIDTH - 1,								// Data in left bound
+	parameter integer VL = ((REG_WIDTH * DATA_WIDTH) << SEL_WIDTH) - 1	// Value out left bound
 )(
 	// Controller
 	output reg  [SL:0] gp_sel,
@@ -26,7 +30,7 @@ module gamepad #(
 	output reg         gp_clk,
 
 	// Current value
-	output wire [OL:0] gp_value,
+	output wire [VL:0] gp_value,
 
 	// Control
 	input  wire        ctrl_run,
@@ -36,7 +40,9 @@ module gamepad #(
 	input  wire        rst
 );
 
-	localparam integer TW = $clog2(DIV);
+	localparam integer TL = $clog2(DIV);		// Divider counter left bound
+	localparam integer BL = $clog2(REG_WIDTH);	// Bit counter left bound
+	localparam integer RL = REG_WIDTH - 1;		// Shift Register left bound
 
 
 	// Signals
@@ -51,24 +57,23 @@ module gamepad #(
 		ST_CLK_LO    = 4,
 		ST_NEXT      = 5;
 
-
 	reg [2:0] state;
 	reg [2:0] state_nxt;
 
 	// Tick
-	reg  [TW:0] tick_cnt;
+	reg  [TL:0] tick_cnt;
 	wire        tick;
 
 	// Bit-Counter
-	reg  [4:0] bit_cnt;
-	wire       bit_last;
-	wire       bit_shift;
+	reg  [BL:0] bit_cnt;
+	wire        bit_last;
+	wire        bit_shift;
 
 	// Shift register
-	reg [15:0] shift_reg[0:DL];
+	reg  [RL:0] shift_reg[0:DL];
 
 	// Current value
-	reg [15:0] value[0:(1<<SEL_WIDTH)-1][0:DL];
+	reg  [RL:0] value[0:(1<<SEL_WIDTH)-1][0:DL];
 
 
 	// FSM
@@ -99,15 +104,15 @@ module gamepad #(
 
 			ST_LATCH:
 				if (tick)
-					state_nxt = ST_CLK_HI;
+					state_nxt = ST_CLK_LO;
 
 			ST_CLK_HI:
 				if (tick)
-					state_nxt = ST_CLK_LO;
+					state_nxt = bit_last ? ST_NEXT : ST_CLK_LO;
 
 			ST_CLK_LO:
 				if (tick)
-					state_nxt = bit_last ? ST_NEXT : ST_CLK_HI;
+					state_nxt = ST_CLK_HI;
 
 			ST_NEXT:
 				state_nxt = ctrl_run ? ST_PRE_PAUSE : ST_IDLE;
@@ -122,9 +127,9 @@ module gamepad #(
 		if (state == ST_IDLE)
 			tick_cnt <= 0;
 		else
-			tick_cnt <= { 1'b0, tick_cnt[TW-1:0] } + 1;
+			tick_cnt <= { 1'b0, tick_cnt[TL-1:0] } + 1;
 
-	assign tick = tick_cnt[TW];
+	assign tick = tick_cnt[TL];
 
 
 	// Bit Counter
@@ -132,12 +137,12 @@ module gamepad #(
 
 	always @(posedge clk)
 		if (state == ST_LATCH)
-			bit_cnt <= 5'h00;
+			bit_cnt <= REG_WIDTH - 1;
 		else
-			bit_cnt <= bit_cnt + bit_shift;
+			bit_cnt <= bit_cnt + {(BL+1){bit_shift}};
 
-	assign bit_last = bit_cnt[4];
-	assign bit_shift = (state == ST_CLK_HI) & tick;
+	assign bit_last = bit_cnt[BL];
+	assign bit_shift = (state == ST_CLK_LO) & tick;
 
 
 	// Shift registers
@@ -148,7 +153,7 @@ module gamepad #(
 	always @(posedge clk)
 		if (bit_shift)
 			for (i=0; i<DATA_WIDTH; i=i+1)
-				shift_reg[i] = { gp_data[i], shift_reg[i][15:1] };
+				shift_reg[i] = { ~gp_data[i], shift_reg[i][RL:1] };
 
 
 	// Game pad control
@@ -156,8 +161,8 @@ module gamepad #(
 
 	always @(posedge clk)
 	begin
-		gp_latch <=  (state == ST_LATCH);
-		gp_clk   <= ~(state == ST_CLK_LO);
+		gp_latch <= (state == ST_LATCH);
+		gp_clk   <= (state == ST_CLK_HI);
 	end
 
 	always @(posedge clk)
@@ -179,10 +184,10 @@ module gamepad #(
 			// Capture
 			always @(posedge clk)
 				if ((state == ST_NEXT) & (gp_sel == j))
-					value[j][k] <= ~shift_reg[k];
+					value[j][k] <= shift_reg[k];
 
 			// Mapping to flat value
-			assign gp_value[(j*DATA_WIDTH+k)*16+:16] = value[j][k];
+			assign gp_value[(j*DATA_WIDTH+k)*REG_WIDTH+:REG_WIDTH] = value[j][k];
 		end
 
-endmodule // gamepad
+endmodule // gamepad_cont

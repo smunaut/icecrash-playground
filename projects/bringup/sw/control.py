@@ -275,6 +275,28 @@ class I2CMaster(object):
 def hexdump(x):
 	return binascii.b2a_hex(x).decode('utf-8')
 
+def poll_gamepad_cont(wbi):
+	# Enable
+	wbi.write(0x10000, 1)
+
+	# Poll
+	pv = None
+
+	while True:
+		# Read value
+		rv = [ wbi.read(0x10000 + i) & 0xfff for i in range(4) ]
+
+		# Display if changed
+		if pv != rv:
+			fv = [f"{rv[i]:012b}" for i in range(4)]
+			print("\t".join(fv))
+
+		pv = rv
+
+		# Wait a bit
+		time.sleep(0.05)
+
+
 def main(argv0, port='/dev/ttyACM0'):
 	wbi   = WishboneInterface(port=port)
 	i2c   = I2CMaster(wbi, 0x00000)
@@ -336,25 +358,7 @@ def main(argv0, port='/dev/ttyACM0'):
 	print("Audio status: %02x" % i2c.read_reg(0x72, 0x24));
 
 	# Controller
-		# Enable
-	wbi.write(0x10000, 1)
-
-		# Poll
-	pv = None
-
-	while True:
-		# Read value
-		rv = [ wbi.read(0x10000 + i) for i in range(4) ]
-
-		# Display if changed
-		if pv != rv:
-			fv = [f"{rv[i]:016b}" for i in range(4)]
-			print("\t".join(fv))
-
-		pv = rv
-
-		# Wait a bit
-		time.sleep(0.05)
+	poll_gamepad_cont(wbi)
 
 
 if __name__ == '__main__':

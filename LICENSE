@@ -1,0 +1,18 @@
+This repository contains a variety of cores and examples and they are
+licensed under a wide variety of licenses :
+
+ - MIT license
+ - CERN OpenHardware License (one of the 3 variants)
+ - Possibly others for code imported from other projects
+
+ Full license text for those is available in the doc/ directory.
+
+Each file/project/core has the applicable license in its header.
+
+This repository also contains submodules that are licensed under their
+own licenses.
+
+In general I target the CERN-OHL for the HDL and MIT for the software.
+It's however possible some have not been migrated yet or are imported
+from external sources. If you want some of the code here under a different
+license, feel free to ask and I'll see what I can do.
